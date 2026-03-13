@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison Oracle | Aether Sovereign</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+:root{
+--gold:#d4af37;
+--gold-bright:#fcf6ba;
+--bg-dark:#020202;
+--glass:rgba(8,8,8,0.95);
+--border:rgba(212,175,55,0.15);
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:var(--bg-dark);
+color:#fff;
+font-family:'Inter',sans-serif;
+min-height:100vh;
+padding:60px 20px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:var(--glass);
+border:1px solid var(--border);
+border-radius:40px;
+padding:60px;
+}
+
+h2{
+font-family:'Cinzel',serif;
+font-size:2.5rem;
+text-align:center;
+letter-spacing:10px;
+color:var(--gold-bright);
+margin-bottom:10px;
+text-transform:uppercase;
+}
+
+.tagline{
+text-align:center;
+font-size:10px;
+letter-spacing:6px;
+color:var(--gold);
+margin-bottom:40px;
+}
+
+.input-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:25px;
+margin-bottom:25px;
+}
+
+label{
+font-size:10px;
+color:var(--gold);
+letter-spacing:2px;
+margin-bottom:8px;
+display:block;
+}
+
+input,textarea{
+width:100%;
+padding:15px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.1);
+background:#000;
+color:#fff;
+}
+
+textarea{
+margin-top:10px;
+}
+
+.btn-oracle{
+margin-top:25px;
+width:100%;
+padding:18px;
+border:none;
+border-radius:15px;
+background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+font-weight:bold;
+letter-spacing:3px;
+cursor:pointer;
+}
+#verdictText{
+white-space: pre-line;
+text-align: left;
+line-height: 1.9;
+font-size: 16px;
+font-family: 'Inter', sans-serif;
+padding: 25px;
+background: rgba(255,255,255,0.03);
+border-radius: 15px;
+border: 1px solid rgba(212,175,55,0.2);
+}
+#verdictText::after{
+content:"|";
+animation:blink 1s infinite;
+margin-left:3px;
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:0}
+100%{opacity:1}
+}
+
+.loader{
+display:none;
+text-align:center;
+margin-top:40px;
+}
+
+.loader i{
+font-size:35px;
+color:var(--gold);
+animation:spin 2s linear infinite;
+}
+
+@keyframes spin{
+100%{transform:rotate(360deg);}
+}
+
+#resultZone{
+display:none;
+margin-top:50px;
+}
+
+.verdict-box{
+border:1px solid var(--gold);
+padding:40px;
+border-radius:30px;
+text-align:center;
+}
+
+.final-label{
+color:var(--gold);
+font-size:10px;
+letter-spacing:5px;
+display:block;
+margin-bottom:20px;
+}
+
+#verdictText{
+line-height:1.8;
+font-size:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Comparison Oracle</h2>
+<p class="tagline">BINARY_SYNTHESIS_PROTOCOL</p>
+
+<div class="input-grid">
+
+<div>
+<label>COMPONENT_ALPHA</label>
+<input id="option1" placeholder="Option A">
+</div>
+
+<div>
+<label>COMPONENT_BETA</label>
+<input id="option2" placeholder="Option B">
+</div>
+
+</div>
+
+<label>GUIDING_GOAL</label>
+<textarea id="myWish" rows="2" placeholder="What is your goal?"></textarea>
+
+<button class="btn-oracle" onclick="runOracle()">Initiate Synthesis</button>
+
+<div class="loader" id="loader">
+<i class="fas fa-circle-notch"></i>
+<p style="margin-top:10px;color:var(--gold);font-size:12px;">Analyzing...</p>
+</div>
+
+<div id="resultZone">
+
+<div class="verdict-box">
+
+<span class="final-label">AI ANALYSIS</span>
+
+<div id="verdictText"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+async function runOracle(){
+
+const btn = document.querySelector('.btn-oracle')
+const loader = document.getElementById('loader')
+const result = document.getElementById('resultZone')
+
+const o1 = document.getElementById('option1').value.trim()
+const o2 = document.getElementById('option2').value.trim()
+const goal = document.getElementById('myWish').value.trim()
+
+loader.style.display="block"
+result.style.display="none"
+btn.disabled=true
+
+try{
+
+const res = await fetch("/compare_api",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+option1:o1,
+option2:o2,
+goal:goal
+})
+})
+
+const data = await res.json()
+
+loader.style.display="none"
+result.style.display="block"
+btn.disabled=false
+
+typeAIResult(data.reply)
+
+}catch(err){
+
+loader.style.display="none"
+btn.disabled=false
+document.getElementById("verdictText").innerHTML="⚠️ AI engine failed."
+
+}
+
+}
+
+
+
+function typeAIResult(text){
+
+const box = document.getElementById("verdictText")
+
+// format text first
+text = text
+.replace(/🅰️/g,"\n🅰️ Option A\n")
+.replace(/🅱️/g,"\n🅱️ Option B\n")
+.replace(/🎯/g,"\n\n🎯 Final Suggestion\n")
+
+box.innerHTML = ""
+
+let i = 0
+let speed = 18
+
+function typing(){
+
+if(i < text.length){
+
+box.innerHTML += text.charAt(i)
+i++
+setTimeout(typing, speed)
+
+}
+
+}
+
+typing()
+
+}
+
+</script>
