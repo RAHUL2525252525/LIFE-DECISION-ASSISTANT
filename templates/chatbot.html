@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Oracle | Aether Sovereign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&family=Orbitron:wght@400;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --gold: #d4af37;
+    --gold-bright: #fcf6ba;
+    --bg-dark: #050505;
+    --glass: rgba(12, 12, 12, 0.9);
+    --border: rgba(212, 175, 55, 0.2);
+    --ai-bubble: rgba(212, 175, 55, 0.05);
+    --user-bubble: rgba(255, 255, 255, 0.03);
+    --accent-glow: rgba(212, 175, 55, 0.15);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg-dark);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    background-image: 
+        radial-gradient(circle at 50% 50%, #111 0%, #050505 100%),
+        linear-gradient(rgba(212, 175, 55, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+}
+.container {
+    width: 100%;
+    max-width: 950px;
+    height: 92vh;
+    background: var(--glass);
+    backdrop-filter: blur(50px);
+    border-radius: 40px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 40px var(--accent-glow);
+    position: relative;
+    overflow: hidden;
+}
+.container::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+    animation: scanLine 8s linear infinite;
+    z-index: 10;
+    pointer-events: none;
+}
+@keyframes scanLine {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+header {
+    padding: 30px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.oracle-brand h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+    background: linear-gradient(to right, #fff, var(--gold-bright), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.status-pill {
+    background: rgba(0, 255, 150, 0.05);
+    border: 1px solid rgba(0, 255, 150, 0.2);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #00ff96;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.pulse {
+    width: 6px; height: 6px; background: #00ff96; border-radius: 50%;
+    animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+#chat-box {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    scrollbar-width: none;
+}
+#chat-box::-webkit-scrollbar { display: none; }
+.msg {
+    max-width: 80%;
+    padding: 20px 25px;
+    font-size: 15px;
+    line-height: 1.7;
+    position: relative;
+    transition: 0.3s ease;
+}
+.ai-msg {
+    align-self: flex-start;
+    background: var(--ai-bubble);
+    color: #e0e0e0;
+    border-radius: 0 25px 25px 25px;
+    border-left: 2px solid var(--gold);
+    box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
+}
+.user-msg {
+    align-self: flex-end;
+    background: var(--user-bubble);
+    color: var(--gold-bright);
+    border-radius: 25px 25px 0 25px;
+    border: 1px solid rgba(255,255,255,0.05);
+    font-weight: 300;
+}
+.ai-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    display: block;
+    opacity: 0.6;
+}
+.input-area {
+    padding: 35px 40px;
+    background: rgba(0,0,0,0.4);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.input-wrapper {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 20px;
+    display: flex;
+    align-items: center;
+    transition: 0.4s;
+}
+.input-wrapper:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+    background: rgba(255,255,255,0.04);
+}
+#message {
+    width: 100%;
+    padding: 15px 0;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+}
+.send-btn {
+    width: 55px; height: 55px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: #000;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex; align-items: center; justify-content: center;
+}
+.send-btn:hover {
+    transform: translateY(-5px) rotate(5deg);
+    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3);
+}
+.thinking-dots { display: flex; gap: 5px; padding: 10px; }
+.dot {
+    width: 6px; height: 6px; background: var(--gold);
+    border-radius: 50%; opacity: 0.4;
+    animation: dotFlow 1.4s infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotFlow {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-5px); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="oracle-brand">
+            <h2>AI Oracle</h2>
+        </div>
+        <div class="status-pill">
+            <div class="pulse"></div>
+            SOVEREIGN_LINK_STABLE
+        </div>
+    </header>
+
+    <div id="chat-box">
+        <div class="msg ai-msg">
+            <span class="ai-label">SYSTEM_INITIALIZED</span>
+            Greetings, architect of your own destiny. 🔱<br><br>
+            I am the <b>Aether Oracle</b>. I have synthesized your career trajectories into my neural matrix. <br><br>
+            What strategic inquiry shall we explore today?
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <i class="fas fa-terminal" style="color: var(--gold); font-size: 12px; margin-right: 15px;"></i>
+            <input type="text" id="message" placeholder="Input directive..." autocomplete="off">
+        </div>
+        <button class="send-btn" onclick="sendMessage()">
+            <i class="fas fa-bolt"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+const inputField = document.getElementById("message");
+const chat = document.getElementById("chat-box");
+
+inputField.addEventListener("keypress", (e) => {
+    if(e.key === "Enter") sendMessage();
+});
+
+async function sendMessage(){
+    const message = inputField.value.trim();
+    if(!message) return;
+
+    // Append User Message
+    const userDiv = document.createElement("div");
+    userDiv.className = "msg user-msg";
+    userDiv.textContent = message;
+    chat.appendChild(userDiv);
+    inputField.value = "";
+    scrollToBottom();
+
+    // Append AI Thinking
+    const aiDiv = document.createElement("div");
+    aiDiv.className = "msg ai-msg";
+    aiDiv.innerHTML = `
+        <span class="ai-label">NEURAL_PROCESSING</span>
+        <div class="thinking-dots" id="loading">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>`;
+    chat.appendChild(aiDiv);
+    scrollToBottom();
+
+    // Call backend API
+    try {
+        const response = await fetch("/chatbot_api", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message})
+        });
+        const data = await response.json();
+        const reply = data.reply;
+
+        // Remove thinking dots
+        const loading = aiDiv.querySelector("#loading");
+        if(loading) loading.remove();
+
+        // Add AI label
+        const label = document.createElement("span");
+        label.className = "ai-label";
+        label.innerText = "ORACLE_RESPONSE";
+        aiDiv.appendChild(label);
+
+        // Type AI message
+        typeMessage(reply, aiDiv);
+    } catch(err) {
+        console.error(err);
+        aiDiv.textContent = "⚠️ Error connecting to AI.";
+    }
+}
+
+function typeMessage(text, element){
+    let i = 0;
+    const speed = 15;
+    function typing(){
+        if(i < text.length){
+            if(text.charAt(i) === "\n") element.innerHTML += "<br>";
+            else element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typing, speed);
+            if(i % 3 === 0) scrollToBottom();
+        }
+    }
+    typing();
+}
+
+function scrollToBottom() {
+    chat.scrollTo({top: chat.scrollHeight, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>
