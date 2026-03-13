@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Goal Planner | Aether Sovereign</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Montserrat:wght@300;400;600&family=Poppins:wght@400;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+:root{
+--gold:#d4af37;
+--gold-bright:#fcf6ba;
+--bg-dark:#050505;
+--glass-deep:rgba(10,10,10,0.9);
+--border:rgba(212,175,55,0.2);
+--accent-glow:rgba(212,175,55,0.1);
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:var(--bg-dark);
+color:#fff;
+font-family:'Montserrat',sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:40px;
+}
+
+.container{
+max-width:850px;
+width:100%;
+background:var(--glass-deep);
+backdrop-filter:blur(40px);
+border:1px solid var(--border);
+border-radius:40px;
+padding:60px;
+box-shadow:0 0 100px rgba(0,0,0,1),0 0 40px var(--accent-glow);
+}
+
+h2{
+font-family:'Cinzel',serif;
+font-size:2.4rem;
+text-align:center;
+background:linear-gradient(to right,#fff,var(--gold-bright),#fff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+letter-spacing:6px;
+margin-bottom:5px;
+text-transform:uppercase;
+}
+
+.subtitle{
+text-align:center;
+font-size:12px;
+color:var(--gold);
+margin-bottom:40px;
+letter-spacing:5px;
+}
+
+.input-deck{
+background:rgba(255,255,255,0.02);
+padding:35px;
+border-radius:24px;
+border:1px solid var(--border);
+margin-bottom:40px;
+}
+
+label{
+display:block;
+font-family:'Poppins',sans-serif;
+font-size:11px;
+color:var(--gold);
+margin-bottom:10px;
+letter-spacing:2px;
+}
+
+select,input{
+width:100%;
+padding:16px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.1);
+background:rgba(0,0,0,0.4);
+color:#fff;
+font-size:14px;
+outline:none;
+}
+
+#goalInput{
+display:none;
+margin-top:10px;
+}
+
+.btn-manifest{
+width:100%;
+padding:18px;
+border-radius:14px;
+border:none;
+cursor:pointer;
+font-family:'Poppins',sans-serif;
+font-weight:700;
+letter-spacing:3px;
+color:#000;
+background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+margin-top:15px;
+}
+
+#resultsArea{
+display:none;
+margin-top:40px;
+}
+
+.result-box{
+border:1px solid var(--border);
+padding:35px;
+border-radius:20px;
+background:rgba(0,0,0,0.5);
+line-height:1.8;
+font-size:15px;
+color:#eaeaea;
+}
+
+.cursor{
+display:inline-block;
+width:8px;
+height:15px;
+background:var(--gold);
+margin-left:5px;
+animation:blink 0.8s infinite;
+}
+
+@keyframes blink{
+50%{opacity:0}
+}
+
+b{
+color:var(--gold-bright);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Goal Planner</h2>
+<p class="subtitle">AI Strategic Roadmap Generator</p>
+
+<div class="input-deck">
+
+<form id="goalForm">
+
+<label>🎯 SELECT YOUR GOAL</label>
+
+<select id="goalSelect">
+<option value="">Select Goal</option>
+<option value="Become AI Engineer">Become AI Engineer</option>
+<option value="Financial Independence">Financial Independence</option>
+<option value="Build Tech Startup">Build Tech Startup</option>
+<option value="Full Stack Developer">Full Stack Developer</option>
+<option value="Fitness Transformation">Fitness Transformation</option>
+<option value="Other">Other</option>
+</select>
+
+<input type="text" id="goalInput" placeholder="Enter your goal">
+
+<button type="submit" class="btn-manifest">
+Generate AI Roadmap
+</button>
+
+</form>
+
+</div>
+
+<div id="resultsArea">
+
+<div class="result-box" id="goalBox"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const goalSelect=document.getElementById("goalSelect")
+const goalInput=document.getElementById("goalInput")
+const goalBox=document.getElementById("goalBox")
+const resultsArea=document.getElementById("resultsArea")
+const form=document.getElementById("goalForm")
+
+goalSelect.addEventListener("change",()=>{
+
+if(goalSelect.value==="Other"){
+goalInput.style.display="block"
+}else{
+goalInput.style.display="none"
+}
+
+})
+
+form.addEventListener("submit",async(e)=>{
+
+e.preventDefault()
+
+const goalValue=goalSelect.value==="Other"
+?goalInput.value.trim()
+:goalSelect.value
+
+if(!goalValue) return
+
+resultsArea.style.display="block"
+
+goalBox.innerHTML="🤖 AI is generating your roadmap...<span class='cursor'></span>"
+
+try{
+
+const response=await fetch("/goalplanner_api",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+goal:goalValue
+})
+
+})
+
+const data=await response.json()
+
+typeAI(data.reply,goalBox)
+
+}catch(error){
+
+goalBox.innerHTML="⚠️ AI failed to generate roadmap. Try again."
+
+}
+
+})
+
+function typeAI(text,element){
+
+let processed=text
+.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+.replace(/\n/g,'<br>')
+.replace(/•/g,"👉")
+
+let i=0
+
+element.innerHTML=""
+
+function typing(){
+
+if(i<processed.length){
+
+if(processed[i]==="<"){
+
+let tagEnd=processed.indexOf(">",i)
+
+element.innerHTML+=processed.substring(i,tagEnd+1)
+
+i=tagEnd+1
+
+}else{
+
+element.innerHTML+=processed[i]
+
+i++
+
+}
+
+setTimeout(typing,15)
+
+}else{
+
+element.innerHTML+='<span class="cursor"></span>'
+
+}
+
+}
+
+typing()
+
+}
+
+</script>
+
+</body>
+</html>
