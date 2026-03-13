@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Portal | Aether Sovereign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #fcf6ba;
+            --bg-dark: #050505;
+            --glass: rgba(10, 10, 10, 0.85);
+            --border: rgba(212, 175, 55, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .title-container {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 8px;
+            background: linear-gradient(to right, #fff, var(--gold-bright), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .highlight { color: var(--gold); }
+
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--gold);
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+        }
+
+        /* Widened Luxury Login Card */
+        .card {
+            width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            padding: 50px 80px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            animation: slideUpFade 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Flash Message Styling */
+        .flash-messages {
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .flash {
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .flash.error {
+            background: rgba(255, 70, 70, 0.1);
+            color: #ff4646;
+            border-color: rgba(255, 70, 70, 0.3);
+        }
+
+        .flash.success {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-bright);
+            border-color: var(--border);
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.4s;
+        }
+
+        input:focus {
+            border-color: var(--gold-bright);
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: 0.4s;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 11px;
+            color: var(--gold);
+            opacity: 0.4;
+            letter-spacing: 4px;
+            position: relative;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: var(--border);
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .google-btn {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .google-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--gold);
+        }
+
+        .google-btn img { width: 18px; }
+
+        p.register-text {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-left: 5px;
+        }
+
+        a:hover { color: var(--gold-bright); }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+<canvas id="neuralBg"></canvas>
+
+<div class="title-container">
+    <h1 class="title">LIFE DECISION <span class="highlight">ASSISTANT</span></h1>
+    <div class="subtitle">Neural Decision Intelligence</div>
+</div>
+
+<div class="card">
+    <h2>WELCOME BACK !</h2>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+    
+    <form method="POST" action="/login">
+        <div class="input-group">
+            <input name="email" type="email" placeholder="Identity (Email)" required>
+        </div>
+        
+        <div class="input-group">
+            <input name="password" id="password" type="password" placeholder="Keyphrase (Password)" required>
+            <i class="fa-solid fa-eye-slash toggle-password" id="eyeIcon"></i>
+        </div>
+        
+        <div class="btn-container">
+            <button type="submit">LOG IN</button>
+        </div>
+    </form>
+
+    <div class="divider">SECURE SYNC</div>
+
+    <button class="google-btn" onclick="location.href='/google/login'">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg">
+        Continue with Google
+    </button>
+
+    <p class="register-text">
+        New to the Nexus? <a href="/register">Create Identity</a>
+    </p>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    eyeIcon.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        eyeIcon.classList.toggle('fa-eye');
+        eyeIcon.classList.toggle('fa-eye-slash');
+    });
+
+    const canvas = document.getElementById("neuralBg");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    const particleCount = 120;
+    const connectionDistance = 160;
+    let mouse = { x: null, y: null };
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.x;
+        mouse.y = e.y;
+    });
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.size = 1.8;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            if (mouse.x && mouse.y) {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 100) {
+                    this.x -= dx * 0.01;
+                    this.y -= dy * 0.01;
+                }
+            }
+        }
+
+        draw() {
+            ctx.fillStyle = "rgba(212, 175, 55, 0.6)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            for (let j = i; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < connectionDistance) {
+                    ctx.strokeStyle = `rgba(212, 175, 55, ${1 - distance/connectionDistance - 0.55})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init();
+    });
+
+    init();
+    animate();
+</script>
+</body>
+</html>
