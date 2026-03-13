@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Aether Sovereign V2 | Life Decision Assistant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+:root{
+--gold:#d4af37;
+--gold-bright:#fcf6ba;
+--gold-glow:rgba(212,175,55,0.6);
+--bg-dark:#000;
+--glass-bg:rgba(15,15,15,.85);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:var(--bg-dark);
+color:#fff;
+height:100vh;
+overflow:hidden;
+display:flex;
+flex-direction:column;
+font-family:'Plus Jakarta Sans',sans-serif
+}
+
+canvas{
+position:fixed;
+inset:0;
+z-index:-1
+}
+
+/* BOOT */
+
+#boot{
+position:fixed;
+inset:0;
+background:#000;
+z-index:10000;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+transition:transform 1.2s cubic-bezier(.8,0,.2,1)
+}
+
+.boot-ring{
+width:100px;
+height:100px;
+border:2px solid transparent;
+border-top:2px solid var(--gold);
+border-radius:50%;
+animation:spin 1s linear infinite;
+box-shadow:0 0 30px var(--gold-glow),inset 0 0 15px var(--gold-glow)
+}
+
+.boot-title{
+margin-top:40px;
+font-family:'Cinzel';
+font-size:24px;
+font-weight:900;
+letter-spacing:12px;
+text-transform:uppercase;
+background:linear-gradient(to right,#8a6628,var(--gold-bright),#8a6628);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+/* HEADER */
+
+.header{
+padding:30px 0 10px;
+text-align:center;
+z-index:100
+}
+
+.project-title{
+font-family:'Cinzel';
+font-size:20px;
+font-weight:700;
+letter-spacing:6px;
+text-transform:uppercase;
+color:var(--gold)
+}
+
+/* MAIN */
+
+.stage{
+flex:1;
+position:relative;
+padding:0 5% 120px;
+display:flex;
+flex-direction:column
+}
+
+.hero{
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center
+}
+
+.hero h2{
+font-family:'Cinzel';
+font-size:clamp(28px,4vw,52px);
+font-weight:400
+}
+
+.hero h2 b{
+color:var(--gold);
+font-weight:900;
+text-shadow:0 0 20px var(--gold-glow)
+}
+
+/* APP WINDOW */
+
+.content-box{
+width:100%;
+height:100%;
+display:none;
+border-radius:35px;
+background:var(--glass-bg);
+backdrop-filter:blur(40px);
+border:1px solid rgba(212,175,55,.3);
+box-shadow:0 40px 100px rgba(0,0,0,.9);
+overflow:hidden;
+transform-origin:center bottom;
+position:relative
+}
+
+@keyframes iPhoneLaunch{
+0%{opacity:0;transform:scale(.3) translateY(200px);filter:blur(20px)}
+100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
+position:absolute;
+top:0;
+left:0;
+display:none
+}
+
+.view-active .content-box{
+display:block;
+animation:iPhoneLaunch .7s cubic-bezier(.34,1.56,.64,1)
+}
+
+.view-active .hero{
+display:none
+}
+
+/* DOCK */
+
+.dock-container{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+z-index:1000
+}
+
+.dock{
+display:flex;
+gap:10px;
+padding:12px 20px;
+border-radius:35px;
+background:rgba(10,10,10,.9);
+backdrop-filter:blur(20px);
+border:1px solid rgba(212,175,55,.2);
+box-shadow:0 20px 50px rgba(0,0,0,.7)
+}
+
+.dock-btn{
+width:65px;
+height:65px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+border-radius:20px;
+color:rgba(255,255,255,.4);
+text-decoration:none;
+cursor:pointer;
+transition:all .4s cubic-bezier(.2,1,.3,1)
+}
+
+.dock-btn i{
+font-size:18px;
+margin-bottom:4px
+}
+
+.dock-btn span{
+font-size:7px;
+font-weight:800;
+text-transform:uppercase;
+letter-spacing:1px
+}
+
+.dock-btn:hover{
+background:rgba(212,175,55,.1);
+color:#fff;
+transform:translateY(-10px)
+}
+
+.dock-btn.active{
+background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+color:#000;
+box-shadow:0 10px 20px var(--gold-glow)
+}
+
+.dock-btn.active i,
+.dock-btn.active span{
+color:#000
+}
+
+.exit{
+margin-left:5px;
+border-left:1px solid rgba(255,255,255,.1);
+padding-left:10px
+}
+
+.exit:hover i{
+color:#ff4444
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="boot">
+<div class="boot-ring"></div>
+<h1 class="boot-title">Life Decision Assistant</h1>
+<p style="font-size:8px;letter-spacing:5px;color:var(--gold);margin-top:15px;opacity:.6;">INITIALIZING AI CORE</p>
+</div>
+
+<canvas id="neuralCanvas"></canvas>
+
+<header class="header">
+<h1 class="project-title">LIFE DECISION ASSISTANT</h1>
+</header>
+
+<main class="stage" id="mainStage">
+
+<div class="hero">
+<p style="font-size:9px;letter-spacing:6px;color:var(--gold);margin-bottom:20px;">NEURAL ENVIRONMENT READY</p>
+<h2>Welcome, <b>{{name}}</b></h2>
+<div style="height:1px;width:40px;background:var(--gold);margin:30px 0;opacity:.4;"></div>
+<p style="font-size:10px;opacity:.5;">SELECT A PROTOCOL FROM THE DOCK TO BEGIN</p>
+</div>
+
+<div class="content-box" id="toolContainer">
+
+<iframe id="career" src="/career"></iframe>
+<iframe id="decision" src="/decision"></iframe>
+<iframe id="goalplanner" src="/goalplanner"></iframe>
+<iframe id="skillgap" src="/skillgap"></iframe>
+<iframe id="comparison" src="/comparison"></iframe>
+<iframe id="chatbot" src="/chatbot"></iframe>
+
+</div>
+
+</main>
+
+<div class="dock-container">
+<nav class="dock">
+
+<div class="dock-btn" onclick="openTool('career',this)">
+<i class="fas fa-user-tie"></i><span>Career</span>
+</div>
+
+<div class="dock-btn" onclick="openTool('decision',this)">
+<i class="fas fa-balance-scale"></i><span>Decision</span>
+</div>
+
+<div class="dock-btn" onclick="openTool('goalplanner',this)">
+<i class="fas fa-bullseye"></i><span>Planner</span>
+</div>
+
+<div class="dock-btn" onclick="openTool('skillgap',this)">
+<i class="fas fa-layer-group"></i><span>Skill Gap</span>
+</div>
+
+<div class="dock-btn" onclick="openTool('comparison',this)">
+<i class="fas fa-columns"></i><span>Compare</span>
+</div>
+
+<div class="dock-btn" onclick="openTool('chatbot',this)">
+<i class="fas fa-robot"></i><span>Oracle</span>
+</div>
+
+<a href="/logout" class="dock-btn exit">
+<i class="fas fa-power-off"></i>
+</a>
+
+</nav>
+</div>
+
+<script>
+
+/* BOOT */
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+document.getElementById("boot").style.transform="translateY(-100%)"
+initParticles()
+
+},3000)
+
+})
+
+/* ULTRA FAST TOOL SWITCH */
+
+let activeFrame=null
+
+function openTool(id,el){
+
+const stage=document.getElementById("mainStage")
+
+document.querySelectorAll(".dock-btn")
+.forEach(btn=>btn.classList.remove("active"))
+
+el.classList.add("active")
+
+if(activeFrame)
+activeFrame.style.display="none"
+
+const frame=document.getElementById(id)
+
+frame.style.display="block"
+activeFrame=frame
+
+if(!stage.classList.contains("view-active"))
+stage.classList.add("view-active")
+
+}
+
+/* PARTICLES */
+
+function initParticles(){
+
+const canvas=document.getElementById("neuralCanvas")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let dots=[]
+
+for(let i=0;i<80;i++){
+
+dots.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vx:(Math.random()-.5)*.4,
+vy:(Math.random()-.5)*.4
+})
+
+}
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,.08)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+dots.forEach(d=>{
+
+d.x+=d.vx
+d.y+=d.vy
+
+if(d.x<0||d.x>canvas.width)d.vx*=-1
+if(d.y<0||d.y>canvas.height)d.vy*=-1
+
+ctx.fillStyle="rgba(212,175,55,.3)"
+
+ctx.beginPath()
+ctx.arc(d.x,d.y,1,0,Math.PI*2)
+ctx.fill()
+
+})
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
+
+}
+
+</script>
+
+</body>
+</html>
