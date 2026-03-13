@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Creation | Aether Sovereign</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-bright: #fcf6ba;
+            --bg-dark: #050505;
+            --glass: rgba(12, 12, 12, 0.85);
+            --border: rgba(212, 175, 55, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Luxury Card */
+        .card {
+            width: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            padding: 60px 80px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            animation: identitySlide 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes identitySlide {
+            0% { transform: scale(0.95) translateY(40px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 8px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--gold);
+            opacity: 0.6;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 4px;
+        }
+
+        /* FLASH MESSAGES - Enhanced for Scannability */
+        .flash {
+            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            animation: fadeInDown 0.5s ease;
+            border: 1px solid transparent;
+        }
+
+        .flash.success {
+            background: rgba(31, 58, 31, 0.4);
+            color: #9cff9c;
+            border-color: rgba(156, 255, 156, 0.2);
+        }
+
+        .flash.error {
+            background: rgba(58, 31, 31, 0.4);
+            color: #ff9c9c;
+            border-color: rgba(255, 156, 156, 0.2);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input Styling */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.4s;
+        }
+
+        input:focus {
+            border-color: var(--gold-bright);
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .toggle-password:hover { opacity: 1; }
+
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: 0.4s;
+        }
+
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4);
+        }
+
+        .login-link {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: 0.3s;
+        }
+
+        a:hover { color: var(--gold-bright); }
+
+    </style>
+</head>
+
+<body>
+
+<canvas id="neuralBg"></canvas>
+
+<div class="card">
+    <h2>REGISTER HERE</h2>
+    <p class="subtitle">LIFE DECISION ASSISTANT</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/register">
+        <div class="input-group">
+            <input name="name" type="text" placeholder="Full Name / Designation" required>
+        </div>
+
+        <div class="input-group">
+            <input name="email" type="email" placeholder="Identity (Email)" required>
+        </div>
+
+        <div class="input-group">
+            <input name="password" id="password" type="password" placeholder="Create Security Key (Password)" required>
+            <i class="fa-solid fa-eye-slash toggle-password" id="eyeIcon"></i>
+        </div>
+
+        <button type="submit">REGISTER</button>
+    </form>
+
+    <div class="login-link">
+        Already registered in the Nexus?
+        <a href="/login">LOG IN</a>
+    </div>
+</div>
+
+<script>
+    /* 1. Password Visibility Toggle Logic */
+    const passwordInput = document.getElementById("password");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    eyeIcon.onclick = function() {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        eyeIcon.classList.toggle("fa-eye", isPassword);
+        eyeIcon.classList.toggle("fa-eye-slash", !isPassword);
+    };
+
+    /* 2. Intelligent Neural Background Effect */
+    const canvas = document.getElementById("neuralBg");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let mouse = { x: null, y: null };
+
+    function setCanvasSize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+    window.addEventListener('resize', () => { setCanvasSize(); init(); });
+
+    class Particle {
+        constructor() {
+            this.init();
+        }
+        init() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = 1.5;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Bounce off boundaries
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+            // Mouse Interaction Logic
+            if (mouse.x) {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    this.x -= dx * 0.02; // Particles gently move away
+                    this.y -= dy * 0.02;
+                }
+            }
+        }
+        draw() {
+            ctx.fillStyle = "rgba(212, 175, 55, 0.7)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function init() {
+        particles = [];
+        // Calculate particle density based on screen resolution
+        const count = (canvas.width * canvas.height) / 10000;
+        for (let i = 0; i < Math.min(count, 150); i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        ctx.fillStyle = "#050505";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+
+            // Connect lines (Neural Network)
+            for (let j = i + 1; j < particles.length; j++) {
+                let dx = particles[i].x - particles[j].x;
+                let dy = particles[i].y - particles[j].y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 150) {
+                    const opacity = 1 - (dist / 150);
+                    ctx.strokeStyle = `rgba(212, 175, 55, ${opacity * 0.25})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    setCanvasSize();
+    init();
+    animate();
+</script>
+
+</body>
+</html>
