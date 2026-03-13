@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Skill Gap Analyzer | Aether Sovereign</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&family=Poppins:wght@400;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+--gold:#d4af37;
+--gold-bright:#fcf6ba;
+--bg-dark:#050505;
+--glass:rgba(12,12,12,0.9);
+--border:rgba(212,175,55,0.2);
+--accent-glow:rgba(212,175,55,0.15);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+background:var(--bg-dark);
+color:#fff;
+font-family:'Montserrat',sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:40px;
+}
+
+.container{
+max-width:850px;
+width:100%;
+background:var(--glass);
+border:1px solid var(--border);
+border-radius:40px;
+padding:60px;
+box-shadow:0 0 100px rgba(0,0,0,1);
+}
+
+h2{
+font-family:'Cinzel',serif;
+font-size:2.4rem;
+text-align:center;
+background:linear-gradient(to bottom,#fff,var(--gold-bright));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+letter-spacing:8px;
+text-transform:uppercase;
+margin-bottom:5px;
+}
+
+.subtitle{
+text-align:center;
+font-size:12px;
+color:var(--gold);
+margin-bottom:50px;
+letter-spacing:5px;
+}
+
+.diagnostic-deck{
+background:rgba(255,255,255,0.02);
+padding:40px;
+border-radius:24px;
+border:1px solid var(--border);
+margin-bottom:40px;
+}
+
+.input-group{margin-bottom:25px;}
+
+label{
+display:block;
+font-family:'Poppins',sans-serif;
+font-size:11px;
+color:var(--gold);
+margin-bottom:10px;
+}
+
+select,input{
+width:100%;
+padding:16px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.1);
+background:rgba(0,0,0,0.6);
+color:#fff;
+font-size:14px;
+}
+
+#careerInput{
+display:none;
+margin-top:10px;
+}
+
+.btn-diagnostic{
+width:100%;
+padding:20px;
+border-radius:16px;
+border:none;
+cursor:pointer;
+font-family:'Poppins',sans-serif;
+font-weight:700;
+letter-spacing:3px;
+color:#000;
+background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+}
+
+#resultsArea{
+display:none;
+margin-top:40px;
+}
+
+.result-box{
+border:1px solid var(--border);
+padding:35px;
+border-radius:20px;
+background:#080808;
+line-height:1.8;
+font-size:15px;
+font-family:'Montserrat',sans-serif;
+}
+
+.result-box b{
+color:var(--gold-bright);
+}
+
+.cursor{
+display:inline-block;
+width:8px;
+height:15px;
+background:var(--gold);
+margin-left:5px;
+animation:blink 0.8s infinite;
+}
+
+@keyframes blink{50%{opacity:0}}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Skill Gap Analyzer</h2>
+<p class="subtitle">AI Competency Diagnostic</p>
+
+<div class="diagnostic-deck">
+
+<form id="skillForm">
+
+<div class="input-group">
+
+<label>🎯 Target Career</label>
+
+<select id="careerSelect">
+<option value="">Select Career</option>
+<option value="Machine Learning Engineer">Machine Learning Engineer</option>
+<option value="Full Stack Developer">Full Stack Developer</option>
+<option value="Cyber Security Analyst">Cyber Security Analyst</option>
+<option value="Blockchain Developer">Blockchain Developer</option>
+<option value="Data Scientist">Data Scientist</option>
+<option value="Other">Other</option>
+</select>
+
+<input type="text" id="careerInput" placeholder="Enter your career">
+
+</div>
+
+<div class="input-group">
+
+<label>💻 Your Current Skills</label>
+
+<input type="text" id="skillsInput" placeholder="Example: Python, SQL, HTML">
+
+</div>
+
+<button class="btn-diagnostic" type="submit">
+Analyze Skill Gap
+</button>
+
+</form>
+
+</div>
+
+<div id="resultsArea">
+
+<div class="result-box" id="gapBox"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const careerSelect=document.getElementById("careerSelect")
+const careerInput=document.getElementById("careerInput")
+const gapBox=document.getElementById("gapBox")
+const resultsArea=document.getElementById("resultsArea")
+const form=document.getElementById("skillForm")
+
+careerSelect.addEventListener("change",()=>{
+
+if(careerSelect.value==="Other"){
+careerInput.style.display="block"
+}else{
+careerInput.style.display="none"
+}
+
+})
+
+form.addEventListener("submit",async(e)=>{
+
+e.preventDefault()
+
+const career=careerSelect.value==="Other"
+?careerInput.value.trim()
+:careerSelect.value
+
+const skills=document.getElementById("skillsInput").value.trim()
+
+if(!career || !skills) return
+
+resultsArea.style.display="block"
+
+gapBox.innerHTML="🤖 AI is analyzing your skills...<span class='cursor'></span>"
+
+try{
+
+const response=await fetch("/skillgap_api",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+career:career,
+skills:skills
+})
+
+})
+
+const data=await response.json()
+
+typeAI(data.reply,gapBox)
+
+}catch(error){
+
+gapBox.innerHTML="⚠️ AI analysis failed. Try again."
+
+}
+
+})
+
+function typeAI(text,element){
+
+let processed=text
+.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+.replace(/\n/g,'<br>')
+.replace(/•/g,"👉")
+
+let i=0
+
+element.innerHTML=""
+
+function typing(){
+
+if(i<processed.length){
+
+if(processed[i]==="<"){
+
+let tagEnd=processed.indexOf(">",i)
+
+element.innerHTML+=processed.substring(i,tagEnd+1)
+
+i=tagEnd+1
+
+}else{
+
+element.innerHTML+=processed[i]
+
+i++
+
+}
+
+setTimeout(typing,15)
+
+}else{
+
+element.innerHTML+='<span class="cursor"></span>'
+
+}
+
+}
+
+typing()
+
+}
+
+</script>
+
+</body>
+</html>
