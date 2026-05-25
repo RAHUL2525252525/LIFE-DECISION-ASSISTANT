@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Access Portal | Life Decision Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --gold:        #c8960c;
+  --gold-bright: #f5d96b;
+  --gold-pale:   rgba(200,150,12,0.08);
+  --gold-glow:   rgba(200,150,12,0.22);
+  --gold-line:   rgba(200,150,12,0.55);
+  --bg:          #060608;
+  --bg-panel:    #09090d;
+  --glass:       rgba(8,8,12,0.92);
+  --text-dim:    rgba(255,255,255,0.72);
+  --text-muted:  rgba(255,255,255,0.40);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; height:100dvh; }
+
+body {
+  min-height:100vh; min-height:100dvh;
+  background:var(--bg);
+  color:white;
+  font-family:'Cormorant Garamond', serif;
+  overflow:hidden;
+  display:flex;
+}
+
+canvas {
+  position:fixed; inset:0;
+  width:100%; height:100%;
+  z-index:0; pointer-events:none;
+}
+
+.layout {
+  position:relative; z-index:1;
+  width:100%; height:100vh; height:100dvh;
+  display:flex;
+}
+
+.panel-left {
+  flex:0 0 42%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:48px 40px;
+  border-right:1px solid var(--gold-line);
+  position:relative; overflow:hidden;
+}
+
+.panel-left::before {
+  content:'';
+  position:absolute;
+  width:500px; height:500px;
+  background:radial-gradient(circle, rgba(200,150,12,0.09) 0%, transparent 70%);
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+
+.corner { position:absolute; width:56px; height:56px; opacity:0.75; }
+.corner svg { width:100%; height:100%; }
+.corner.tl { top:24px; left:24px; }
+.corner.tr { top:24px; right:24px; transform:rotate(90deg); }
+.corner.bl { bottom:24px; left:24px; transform:rotate(-90deg); }
+.corner.br { bottom:24px; right:24px; transform:rotate(180deg); }
+
+.vert-rule {
+  position:absolute; right:-1px; top:50%;
+  transform:translateY(-50%);
+  width:1px; height:60%;
+  background:linear-gradient(to bottom, transparent, var(--gold) 40%, var(--gold) 60%, transparent);
+  opacity:0.6;
+}
+
+.left-brand {
+  text-align:center;
+  animation:riseIn 1.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.emblem {
+  width:96px; height:96px;
+  margin:0 auto 28px;
+  position:relative;
+}
+.emblem-ring {
+  position:absolute; inset:0;
+  border-radius:50%;
+  border:1px solid rgba(200,150,12,0.6);
+  animation:spinSlow 18s linear infinite;
+}
+.emblem-ring.r2 {
+  inset:8px;
+  border-style:dashed;
+  border-color:rgba(200,150,12,0.35);
+  animation-direction:reverse;
+  animation-duration:24s;
+}
+@keyframes spinSlow { to { transform:rotate(360deg); } }
+.emblem-core {
+  position:absolute; inset:18px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(200,150,12,0.18), transparent 70%);
+  border:1px solid rgba(200,150,12,0.5);
+  display:flex; align-items:center; justify-content:center;
+}
+.emblem-glyph {
+  font-family:'Cinzel Decorative', serif;
+  font-size:1.6rem; font-weight:900;
+  background:linear-gradient(135deg, var(--gold-bright), var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.brand-title {
+  font-family:'Cinzel', serif;
+  font-size:clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight:700;
+  letter-spacing:clamp(4px, 1vw, 8px);
+  background:linear-gradient(to right, rgba(245,217,107,0.75), var(--gold-bright), rgba(245,217,107,0.75));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.brand-sub {
+  font-family:'Orbitron', sans-serif;
+  font-size:clamp(0.58rem, 1vw, 0.7rem);
+  color:var(--gold-bright);
+  opacity:0.85;
+  letter-spacing:clamp(3px, 0.8vw, 5px);
+  text-transform:uppercase;
+  margin-bottom:36px;
+}
+
+.divider-ornament {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:32px;
+}
+.div-line { flex:1; height:1px; background:linear-gradient(to right, transparent, rgba(200,150,12,0.6)); }
+.div-line.r { background:linear-gradient(to left, transparent, rgba(200,150,12,0.6)); }
+.div-diamond {
+  width:6px; height:6px;
+  background:var(--gold-bright);
+  transform:rotate(45deg);
+  opacity:0.9;
+}
+
+.left-tagline {
+  font-size:clamp(0.9rem, 1.4vw, 1.05rem);
+  font-style:italic;
+  color:rgba(255,255,255,0.75);
+  line-height:1.9;
+  text-align:center;
+  max-width:260px;
+  letter-spacing:0.02em;
+}
+.left-tagline strong {
+  color:var(--gold-bright);
+  font-style:normal; font-weight:400;
+}
+
+.steps {
+  margin-top:36px;
+  display:flex; flex-direction:column; gap:14px;
+  width:100%; max-width:280px;
+}
+.step {
+  display:flex; align-items:flex-start; gap:14px;
+  animation:riseIn 1.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+.step:nth-child(2) { animation-delay:0.1s; }
+.step:nth-child(3) { animation-delay:0.2s; }
+.step:nth-child(4) { animation-delay:0.3s; }
+.step-num {
+  font-family:'Orbitron', sans-serif;
+  font-size:0.65rem; font-weight:700;
+  color:var(--gold-bright);
+  opacity:0.9;
+  letter-spacing:1px; padding-top:2px; flex-shrink:0;
+}
+.step-text {
+  font-size:0.88rem;
+  color:rgba(255,255,255,0.72);
+  line-height:1.65; font-style:italic;
+}
+
+.panel-right {
+  flex:1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px clamp(24px, 5vw, 64px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.form-shell {
+  width:100%; max-width:400px;
+  animation:riseIn 1.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.form-header { margin-bottom:36px; }
+.form-eyebrow {
+  font-family:'Orbitron', sans-serif;
+  font-size:0.62rem;
+  color:var(--gold-bright);
+  opacity:0.9;
+  letter-spacing:4px; text-transform:uppercase;
+  margin-bottom:10px;
+}
+.form-title {
+  font-family:'Cinzel', serif;
+  font-size:clamp(1.5rem, 3vw, 2.1rem);
+  font-weight:700;
+  letter-spacing:clamp(2px, 0.8vw, 4px);
+  color:#fff;
+  text-transform:uppercase;
+  line-height:1.1; margin-bottom:8px;
+}
+.form-rule {
+  height:1px;
+  background:linear-gradient(to right, var(--gold-bright) 0%, rgba(200,150,12,0.4) 60%, transparent 100%);
+  margin-top:14px;
+}
+
+.flash-messages { margin-bottom:20px; }
+.flash {
+  padding:13px 16px; border-radius:8px;
+  font-size:0.82rem;
+  font-family:'Orbitron', sans-serif;
+  letter-spacing:0.5px;
+  border:1px solid transparent;
+  animation:riseIn 0.5s ease; margin-bottom:8px;
+}
+.flash.error   { background:rgba(255,60,60,0.08); color:#ff9c9c; border-color:rgba(255,80,80,0.25); }
+.flash.success { background:rgba(200,150,12,0.1); color:var(--gold-bright); border-color:rgba(200,150,12,0.4); }
+
+.input-group { margin-bottom:16px; position:relative; }
+
+.input-label {
+  display:block;
+  font-family:'Orbitron', sans-serif;
+  font-size:0.6rem;
+  color:var(--gold-bright);
+  opacity:0.95;
+  letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:8px; padding-left:2px;
+}
+
+input {
+  width:100%;
+  padding:15px 20px;
+  border-radius:6px;
+  border:1px solid rgba(200,150,12,0.5);
+  background:rgba(200,150,12,0.04);
+  color:white;
+  font-size:0.95rem;
+  font-family:'Cormorant Garamond', serif;
+  outline:none;
+  transition:border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  -webkit-appearance:none;
+}
+input:focus {
+  border-color:var(--gold-bright);
+  background:rgba(200,150,12,0.07);
+  box-shadow:0 0 0 3px rgba(200,150,12,0.1), inset 0 0 16px rgba(200,150,12,0.05);
+}
+input::placeholder { color:rgba(255,255,255,0.35); font-style:italic; }
+
+.toggle-password {
+  position:absolute; right:16px; bottom:16px;
+  color:var(--gold-bright); cursor:pointer;
+  opacity:0.7; transition:opacity 0.2s; font-size:0.85rem;
+}
+.toggle-password:hover { opacity:1; }
+
+.forgot-link {
+  display:block; text-align:right;
+  font-family:'Orbitron', sans-serif;
+  font-size:0.58rem;
+  letter-spacing:2px;
+  color:var(--gold-bright); opacity:0.75;
+  text-transform:uppercase; text-decoration:none;
+  margin-top:-6px; margin-bottom:24px;
+  transition:opacity 0.2s;
+}
+.forgot-link:hover { opacity:1; }
+
+.btn-submit {
+  width:100%; padding:16px; border:none; border-radius:6px;
+  background:linear-gradient(135deg, #f5e27a 0%, var(--gold) 50%, #b8960c 100%);
+  color:#1a1100;
+  font-family:'Orbitron', sans-serif;
+  font-weight:700; font-size:0.75rem;
+  letter-spacing:4px; text-transform:uppercase;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:transform 0.25s, box-shadow 0.25s;
+  -webkit-appearance:none;
+}
+.btn-submit::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,0.18), transparent 60%);
+  pointer-events:none;
+}
+.btn-submit::after {
+  content:''; position:absolute;
+  top:-50%; left:-75%;
+  width:50%; height:200%;
+  background:rgba(255,255,255,0.22);
+  transform:skewX(-20deg);
+  transition:left 0.5s ease; pointer-events:none;
+}
+.btn-submit:hover {
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(200,150,12,0.4), 0 4px 12px rgba(200,150,12,0.25);
+}
+.btn-submit:hover::after { left:120%; }
+.btn-submit:active { transform:translateY(0); }
+
+.form-footer {
+  margin-top:28px; text-align:center;
+  font-size:0.9rem; font-style:italic;
+  color:rgba(255,255,255,0.65);
+}
+.form-footer a {
+  color:var(--gold-bright); text-decoration:none;
+  font-style:normal;
+  font-family:'Orbitron', sans-serif;
+  font-size:0.62rem; letter-spacing:2px;
+  margin-left:8px; opacity:0.85;
+  transition:opacity 0.2s;
+}
+.form-footer a:hover { opacity:1; }
+
+@media (max-width: 840px) {
+  body { overflow-y:auto; }
+  .layout { flex-direction:column; height:auto; min-height:100vh; min-height:100dvh; }
+  .panel-left {
+    flex:none; border-right:none;
+    border-bottom:1px solid var(--gold-line);
+    padding:36px 24px 28px;
+  }
+  .corner, .vert-rule { display:none; }
+  .steps { display:none; }
+  .emblem { width:72px; height:72px; margin-bottom:18px; }
+  .left-tagline { display:none; }
+  .divider-ornament { margin-bottom:0; }
+  .panel-right { flex:1; padding:36px clamp(20px,6vw,48px) 48px; overflow-y:visible; }
+}
+@media (max-width: 480px) {
+  .panel-left { padding:28px 20px 22px; }
+  .emblem { width:60px; height:60px; }
+  .brand-title { letter-spacing:4px; }
+  .panel-right { padding:28px 16px 40px; }
+  input { padding:13px 16px; }
+  .btn-submit { padding:15px; letter-spacing:3px; }
+}
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .panel-right { padding-bottom:calc(48px + env(safe-area-inset-bottom)); }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="corner tl">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 54 L2 2 L54 2" stroke="#c8960c" stroke-width="1.5" stroke-opacity="0.9"/>
+        <path d="M2 30 L2 2 L30 2" stroke="#c8960c" stroke-width="0.8" stroke-opacity="0.5"/>
+        <circle cx="2" cy="2" r="2.5" fill="#c8960c" fill-opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="corner tr">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 54 L2 2 L54 2" stroke="#c8960c" stroke-width="1.5" stroke-opacity="0.9"/>
+        <path d="M2 30 L2 2 L30 2" stroke="#c8960c" stroke-width="0.8" stroke-opacity="0.5"/>
+        <circle cx="2" cy="2" r="2.5" fill="#c8960c" fill-opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="corner bl">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 54 L2 2 L54 2" stroke="#c8960c" stroke-width="1.5" stroke-opacity="0.9"/>
+        <path d="M2 30 L2 2 L30 2" stroke="#c8960c" stroke-width="0.8" stroke-opacity="0.5"/>
+        <circle cx="2" cy="2" r="2.5" fill="#c8960c" fill-opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="corner br">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 54 L2 2 L54 2" stroke="#c8960c" stroke-width="1.5" stroke-opacity="0.9"/>
+        <path d="M2 30 L2 2 L30 2" stroke="#c8960c" stroke-width="0.8" stroke-opacity="0.5"/>
+        <circle cx="2" cy="2" r="2.5" fill="#c8960c" fill-opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="vert-rule"></div>
+
+    <div class="left-brand">
+      <div class="emblem">
+        <div class="emblem-ring"></div>
+        <div class="emblem-ring r2"></div>
+        <div class="emblem-core">
+          <span class="emblem-glyph">L</span>
+        </div>
+      </div>
+      <div class="brand-title">Life Decision</div>
+      <div class="brand-sub">Neural Intelligence</div>
+      <div class="divider-ornament">
+        <div class="div-line"></div>
+        <div class="div-diamond"></div>
+        <div class="div-line r"></div>
+      </div>
+      <p class="left-tagline">
+        Clarity for every crossroads.<br>
+        <strong>Intelligence</strong> that guides,<br>
+        <strong>wisdom</strong> that endures.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <span class="step-text">Input your personal data or decision scenario.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <span class="step-text">The AI analyzes multiple possible outcomes.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <span class="step-text">Receive a structured roadmap tailored to you.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <span class="step-text">Refine your goals with ongoing AI guidance.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+    <div class="form-shell">
+
+      <div class="form-header">
+        <div class="form-eyebrow">CREATED BY RAHUL</div>
+        <div class="form-title">Welcome<br>Back</div>
+        <div class="form-rule"></div>
+      </div>
+
+      <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <form method="POST" action="/login">
+        <div class="input-group">
+          <label class="input-label">ENTER EMAIL</label>
+          <input name="email" type="email" placeholder="your@email.com" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">PASSWORD</label>
+          <input name="password" id="password" type="password" placeholder="············" required>
+          <i class="fa-solid fa-eye-slash toggle-password" id="eyeIcon"></i>
+        </div>
+
+        <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
+
+        <button type="submit" class="btn-submit">Log In</button>
+      </form>
+
+      <div class="form-footer">
+        New to the Website?
+        <a href="/register">Register Here</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── Password toggle ── */
+const passwordInput = document.getElementById('password');
+const eyeIcon = document.getElementById('eyeIcon');
+eyeIcon.addEventListener('click', () => {
+  const isPass = passwordInput.type === 'password';
+  passwordInput.type = isPass ? 'text' : 'password';
+  eyeIcon.classList.toggle('fa-eye', isPass);
+  eyeIcon.classList.toggle('fa-eye-slash', !isPass);
+});
+
+/* ══════════════════════════════════════════════
+   BACKGROUND — Constellation Star Map
+══════════════════════════════════════════════ */
+const canvas = document.getElementById('bgCanvas');
+const ctx    = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); init(); });
+
+const STAR_COUNT = window.innerWidth < 600 ? 160 : 280;
+let stars = [];
+
+function mkStar() {
+  return {
+    x:          Math.random(),
+    y:          Math.random(),
+    r:          Math.pow(Math.random(), 2.2) * 1.8 + 0.2,
+    alpha:      Math.random() * 0.7 + 0.25,
+    twinkleSpd: Math.random() * 0.012 + 0.003,
+    twinkleOff: Math.random() * Math.PI * 2,
+    vx:         (Math.random() - 0.5) * 0.000018,
+    vy:         (Math.random() - 0.5) * 0.000018,
+    warm:       Math.random() < 0.35,
+  };
+}
+
+const CONST_COUNT = window.innerWidth < 600 ? 18 : 28;
+let nodes = [];
+
+function mkNode() {
+  const cx = 0.1 + Math.random() * 0.8;
+  const cy = 0.1 + Math.random() * 0.8;
+  const orbitR   = Math.random() * 0.12 + 0.02;
+  const angle    = Math.random() * Math.PI * 2;
+  const orbitSpd = (Math.random() * 0.00008 + 0.00002) * (Math.random() < 0.5 ? 1 : -1);
+  return { cx, cy, orbitR, angle, orbitSpd,
+           x: cx + Math.cos(angle) * orbitR,
+           y: cy + Math.sin(angle) * orbitR };
+}
+
+let edges = [];
+function buildEdges() {
+  edges = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const dists = [];
+    for (let j = 0; j < nodes.length; j++) {
+      if (i === j) continue;
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      dists.push({ j, d: Math.sqrt(dx*dx + dy*dy) });
+    }
+    dists.sort((a, b) => a.d - b.d);
+    const nearK = Math.min(2, dists.length);
+    for (let k = 0; k < nearK; k++) {
+      const e = [Math.min(i, dists[k].j), Math.max(i, dists[k].j)];
+      if (!edges.find(ex => ex[0]===e[0] && ex[1]===e[1])) edges.push(e);
+    }
+  }
+}
+
+function init() {
+  stars = Array.from({ length: STAR_COUNT }, mkStar);
+  nodes = Array.from({ length: CONST_COUNT }, mkNode);
+  buildEdges();
+}
+init();
+
+let shooter = null;
+let shooterTimer = 0;
+const SHOOT_INTERVAL = 220;
+
+function spawnShooter() {
+  const side = Math.random() < 0.5 ? 'top' : 'left';
+  shooter = {
+    x:       side === 'top' ? Math.random() * W : 0,
+    y:       side === 'top' ? 0 : Math.random() * H * 0.5,
+    vx:      side === 'top' ? (Math.random() * 3 + 2)  : (Math.random() * 4 + 3),
+    vy:      side === 'top' ? (Math.random() * 3 + 2)  : (Math.random() * 1 + 0.5),
+    len:     Math.random() * 120 + 80,
+    alpha:   1,
+    life:    0,
+    maxLife: 55 + Math.random() * 30,
+  };
+}
+
+let frame = 0;
+
+function render() {
+  frame++;
+  ctx.clearRect(0, 0, W, H);
+
+  const grad = ctx.createRadialGradient(W*0.4, H*0.4, 0, W*0.5, H*0.5, Math.max(W,H)*0.75);
+  grad.addColorStop(0,   'rgba(12,10,22,0)');
+  grad.addColorStop(0.6, 'rgba(6,4,10,0)');
+  grad.addColorStop(1,   'rgba(2,1,5,0.45)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  stars.forEach(s => {
+    s.x += s.vx; s.y += s.vy;
+    if (s.x < 0) s.x = 1; if (s.x > 1) s.x = 0;
+    if (s.y < 0) s.y = 1; if (s.y > 1) s.y = 0;
+
+    const twinkle = 0.55 + 0.45 * Math.sin(frame * s.twinkleSpd + s.twinkleOff);
+    const a  = s.alpha * twinkle;
+    const sx = s.x * W, sy = s.y * H;
+
+    if (s.r > 1.0) {
+      const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, s.r * 3.5);
+      g.addColorStop(0, s.warm ? `rgba(245,215,100,${a*0.45})` : `rgba(200,210,255,${a*0.3})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(sx, sy, s.r*3.5, 0, Math.PI*2); ctx.fill();
+    }
+
+    ctx.fillStyle = s.warm ? `rgba(255,230,140,${a})` : `rgba(220,230,255,${a})`;
+    ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, Math.PI*2); ctx.fill();
+  });
+
+  edges.forEach(([i, j]) => {
+    const ni = nodes[i], nj = nodes[j];
+    const dx = (ni.x - nj.x) * W;
+    const dy = (ni.y - nj.y) * H;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > Math.min(W,H) * 0.32) return;
+    const opacity = Math.max(0, 0.13 - dist / (Math.min(W,H) * 2.5));
+    ctx.beginPath();
+    ctx.moveTo(ni.x*W, ni.y*H);
+    ctx.lineTo(nj.x*W, nj.y*H);
+    ctx.strokeStyle = `rgba(200,160,30,${opacity})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+  });
+
+  nodes.forEach(n => {
+    n.angle += n.orbitSpd;
+    n.x = n.cx + Math.cos(n.angle) * n.orbitR;
+    n.y = n.cy + Math.sin(n.angle) * n.orbitR;
+    const nx = n.x*W, ny = n.y*H;
+    const g = ctx.createRadialGradient(nx, ny, 0, nx, ny, 5);
+    g.addColorStop(0,   'rgba(245,210,80,0.22)');
+    g.addColorStop(0.4, 'rgba(200,150,12,0.08)');
+    g.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(nx, ny, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,230,130,0.75)';
+    ctx.beginPath(); ctx.arc(nx, ny, 1.4, 0, Math.PI*2); ctx.fill();
+  });
+
+  shooterTimer++;
+  if (shooterTimer > SHOOT_INTERVAL && !shooter) { spawnShooter(); shooterTimer = 0; }
+  if (shooter) {
+    shooter.life++;
+    shooter.x += shooter.vx;
+    shooter.y += shooter.vy;
+    const progress = shooter.life / shooter.maxLife;
+    const a = progress < 0.2  ? progress / 0.2
+            : progress > 0.75 ? 1 - (progress - 0.75) / 0.25
+            : 1;
+    const spd = Math.sqrt(shooter.vx**2 + shooter.vy**2);
+    const tailX = shooter.x - shooter.vx * (shooter.len / spd);
+    const tailY = shooter.y - shooter.vy * (shooter.len / spd);
+    const sg = ctx.createLinearGradient(tailX, tailY, shooter.x, shooter.y);
+    sg.addColorStop(0,   'rgba(245,220,100,0)');
+    sg.addColorStop(0.6, `rgba(245,220,100,${a*0.45})`);
+    sg.addColorStop(1,   `rgba(255,245,200,${a*0.95})`);
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(shooter.x, shooter.y);
+    ctx.strokeStyle = sg;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = `rgba(255,250,220,${a})`;
+    ctx.beginPath(); ctx.arc(shooter.x, shooter.y, 1.8, 0, Math.PI*2); ctx.fill();
+    if (shooter.life >= shooter.maxLife || shooter.x > W+50 || shooter.y > H+50) shooter = null;
+  }
+
+  requestAnimationFrame(render);
+}
+render();
+</script>
+</body>
+</html>

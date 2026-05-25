@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goal Planner | Aether Sovereign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&family=Montserrat:wght@300;400;600&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --gold: #d4af37;
+    --gold-bright: #fcf6ba;
+    --bg-dark: #050505;
+    --glass: rgba(10, 10, 10, 0.95);
+    --border: rgba(212, 175, 55, 0.2);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--bg-dark);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    padding: clamp(20px, 5vw, 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 850px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: clamp(20px, 5vw, 60px);
+}
+
+h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    text-align: center;
+    background: linear-gradient(to right, #fff, var(--gold-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 4px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.subtitle { text-align: center; font-size: 10px; color: var(--gold); margin-bottom: 40px; letter-spacing: 4px; }
+
+.input-deck { background: rgba(255,255,255,0.02); padding: clamp(20px, 3vw, 35px); border-radius: 20px; border: 1px solid var(--border); }
+
+label { display: block; font-size: 10px; color: var(--gold); margin-bottom: 10px; letter-spacing: 2px; }
+
+select, input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #000; color: #fff; outline: none; margin-bottom: 15px; }
+
+.btn-manifest {
+    width: 100%;
+    padding: 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    transition: 0.3s;
+}
+
+#resultsArea { display: none; margin-top: 40px; }
+.result-box { border: 1px solid var(--border); padding: clamp(15px, 3vw, 35px); border-radius: 20px; line-height: 1.8; font-size: 14px; }
+
+@media (max-width: 600px) {
+    .container { border-radius: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Goal Planner</h2>
+    <p class="subtitle">AI STRATEGIC ROADMAP GENERATOR</p>
+
+    <div class="input-deck">
+        <form id="goalForm">
+            <label>🎯 SELECT YOUR GOAL</label>
+            <select id="goalSelect">
+                <option value="">Select Goal</option>
+                <option value="Become AI Engineer">Become AI Engineer</option>
+                <option value="Financial Independence">Financial Independence</option>
+                <option value="Build Tech Startup">Build Tech Startup</option>
+                <option value="Full Stack Developer">Full Stack Developer</option>
+                <option value="Fitness Transformation">Fitness Transformation</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" id="goalInput" placeholder="Enter your goal" style="display:none;">
+            <button type="submit" class="btn-manifest">GENERATE AI ROADMAP</button>
+        </form>
+    </div>
+
+    <div id="resultsArea">
+        <div class="result-box" id="goalBox"></div>
+    </div>
+</div>
+
+<script>
+const goalSelect = document.getElementById("goalSelect");
+const goalInput = document.getElementById("goalInput");
+const goalBox = document.getElementById("goalBox");
+const resultsArea = document.getElementById("resultsArea");
+
+goalSelect.addEventListener("change", () => {
+    goalInput.style.display = goalSelect.value === "Other" ? "block" : "none";
+});
+
+document.getElementById("goalForm").addEventListener("submit", async(e) => {
+    e.preventDefault();
+    const goalValue = goalSelect.value === "Other" ? goalInput.value.trim() : goalSelect.value;
+    if (!goalValue) return;
+
+    resultsArea.style.display = "block";
+    goalBox.innerHTML = "🤖 Generating your roadmap...";
+
+    try {
+        const response = await fetch("/goalplanner_api", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ goal: goalValue })
+        });
+        const data = await response.json();
+        typeAI(data.reply, goalBox);
+    } catch (error) {
+        goalBox.innerHTML = "⚠️ AI failed to generate roadmap.";
+    }
+});
+
+function typeAI(text, element) {
+    let processed = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    let i = 0;
+    element.innerHTML = "";
+    function typing() {
+        if (i < processed.length) {
+            if (processed[i] === "<") {
+                let tagEnd = processed.indexOf(">", i);
+                element.innerHTML += processed.substring(i, tagEnd + 1);
+                i = tagEnd + 1;
+            } else {
+                element.innerHTML += processed[i];
+                i++;
+            }
+            setTimeout(typing, 10);
+        }
+    }
+    typing();
+}
+</script>
+</body>
+</html>

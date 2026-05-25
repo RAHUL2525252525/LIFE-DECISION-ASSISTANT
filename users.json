@@ -1,0 +1,17 @@
+{
+    "srinivasrahul838@gmail.com": {
+        "name": "Rahul s",
+        "password": "Rahul@838",
+        "provider": "email"
+    },
+    "srinivasrahul8171@gmail.com": {
+        "name": "RAHUL S",
+        "password": "google_user",
+        "provider": "google"
+    },
+    "nehasrinivas053@gmail.com": {
+        "name": "Neha Srinivas",
+        "password": "google_user",
+        "provider": "google"
+    }
+}

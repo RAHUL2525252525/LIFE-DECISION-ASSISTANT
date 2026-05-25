@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Oracle | Aether Sovereign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&family=Orbitron:wght@400;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --gold: #d4af37;
+    --gold-bright: #fcf6ba;
+    --bg-dark: #050505;
+    --glass: rgba(12, 12, 12, 0.9);
+    --border: rgba(212, 175, 55, 0.2);
+    --ai-bubble: rgba(212, 175, 55, 0.05);
+    --user-bubble: rgba(255, 255, 255, 0.03);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg-dark);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.container {
+    width: 100%;
+    max-width: 950px;
+    height: 95vh;
+    background: var(--glass);
+    backdrop-filter: blur(50px);
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+}
+header {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.oracle-brand h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    letter-spacing: 4px;
+    background: linear-gradient(to right, #fff, var(--gold-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.status-pill {
+    background: rgba(0, 255, 150, 0.05);
+    border: 1px solid rgba(0, 255, 150, 0.2);
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #00ff96;
+}
+#chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.msg {
+    max-width: 90%;
+    padding: 15px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ai-msg { align-self: flex-start; background: var(--ai-bubble); border-radius: 0 20px 20px 20px; border-left: 2px solid var(--gold); }
+.user-msg { align-self: flex-end; background: var(--user-bubble); border-radius: 20px 20px 0 20px; border: 1px solid rgba(255,255,255,0.05); }
+.ai-label { font-family: 'Orbitron', sans-serif; font-size: 8px; color: var(--gold); display: block; margin-bottom: 5px; opacity: 0.6; }
+
+.input-area {
+    padding: 20px;
+    background: rgba(0,0,0,0.4);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+}
+.input-wrapper {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+#message { width: 100%; padding: 12px 0; background: transparent; border: none; color: #fff; outline: none; }
+.send-btn {
+    width: 45px; height: 45px;
+    border-radius: 12px;
+    border: none;
+    background: var(--gold);
+    color: #000;
+    cursor: pointer;
+}
+
+/* Mobile responsiveness */
+@media(max-width: 480px) {
+    .container { border-radius: 20px; }
+    .status-pill { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="oracle-brand"><h2>AI Oracle</h2></div>
+        <div class="status-pill">SOVEREIGN_LINK_STABLE</div>
+    </header>
+
+    <div id="chat-box">
+        <div class="msg ai-msg">
+            <span class="ai-label">SYSTEM_INITIALIZED</span>
+            Greetings, architect. I am the <b>Aether Oracle</b>. How shall we navigate your path today?
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="message" placeholder="Input directive..." autocomplete="off">
+        </div>
+        <button class="send-btn" onclick="sendMessage()">
+            <i class="fas fa-bolt"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+const inputField = document.getElementById("message");
+const chat = document.getElementById("chat-box");
+
+function sendMessage(){
+    const message = inputField.value.trim();
+    if(!message) return;
+
+    const userDiv = document.createElement("div");
+    userDiv.className = "msg user-msg";
+    userDiv.textContent = message;
+    chat.appendChild(userDiv);
+    inputField.value = "";
+    scrollToBottom();
+
+    // Mock response logic
+    setTimeout(() => {
+        const aiDiv = document.createElement("div");
+        aiDiv.className = "msg ai-msg";
+        aiDiv.innerHTML = `<span class="ai-label">ORACLE_RESPONSE</span>Synthesizing data for: ${message}...`;
+        chat.appendChild(aiDiv);
+        scrollToBottom();
+    }, 1000);
+}
+
+function scrollToBottom() {
+    chat.scrollTop = chat.scrollHeight;
+}
+</script>
+</body>
+</html>

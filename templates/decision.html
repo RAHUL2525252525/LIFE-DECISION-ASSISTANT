@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Oracle | Aether Sovereign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --gold: #d4af37;
+    --gold-bright: #fcf6ba;
+    --gold-glow: rgba(212, 175, 55, 0.3);
+    --bg-dark: #050505;
+    --glass: rgba(15, 15, 15, 0.95);
+    --border: rgba(212, 175, 55, 0.15);
+}
+* { margin:0; padding:0; box-sizing: border-box; }
+
+body {
+    background: var(--bg-dark);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: clamp(20px, 5vw, 60px);
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    text-align: center;
+    background: linear-gradient(to bottom, #fff 20%, var(--gold-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 5px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+label {
+    font-weight: 800;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+}
+
+textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 15px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+}
+
+.btn-resolve {
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.results-window {
+    border-top: 1px solid var(--border);
+    padding-top: 30px;
+    margin-top: 30px;
+    display: none;
+}
+
+.analysis-point {
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#verdictText {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 700;
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+@media (max-width: 480px) {
+    .container { padding: 20px; border-radius: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Decision Oracle</h1>
+
+    <label><i class="fas fa-scroll"></i> SITUATION CONTEXT</label>
+    <textarea id="situation" rows="5" placeholder="Describe your situation..."></textarea>
+
+    <button class="btn-resolve" onclick="runDecision()">Initiate Analysis</button>
+
+    <div id="loader" style="display:none; text-align:center; padding:20px; color:var(--gold);">
+        <i class="fas fa-circle-notch fa-spin"></i> THINKING...
+    </div>
+
+    <div id="resultsWindow" class="results-window">
+        <label><i class="fas fa-brain"></i> INSIGHTS</label>
+        <div class="analysis-section" id="analysis"></div>
+
+        <label style="margin-top:20px;"><i class="fas fa-crown"></i> FINAL DECISION</label>
+        <div id="verdictText"></div>
+    </div>
+</div>
+
+<script>
+async function runDecision() {
+    const situation = document.getElementById("situation").value.trim();
+    if (!situation) return alert("Please enter a situation.");
+
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("resultsWindow").style.display = "none";
+    document.getElementById("analysis").innerHTML = "";
+    
+    try {
+        const response = await fetch("/decision_api", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ situation })
+        });
+        const data = await response.json();
+        
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("resultsWindow").style.display = "block";
+
+        let lines = data.reply.split("\n").filter(l => l.trim() !== "");
+        let reasoning = lines.filter(l => !/decision[:]?/i.test(l));
+        let final = lines.find(l => /decision[:]?/i.test(l)) || "Analysis complete.";
+
+        reasoning.forEach(text => {
+            const div = document.createElement("div");
+            div.className = "analysis-point";
+            div.textContent = text;
+            document.getElementById("analysis").appendChild(div);
+        });
+
+        document.getElementById("verdictText").textContent = final.replace(/decision[:]?/i, "").trim();
+    } catch (err) {
+        alert("Error connecting to Oracle.");
+        document.getElementById("loader").style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
