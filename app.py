@@ -55,44 +55,99 @@ def save_users(users):
 
 # -------------------------------
 # INTELLIGENT AI ENGINE (WITH FALLBACK)
+# FIX: Updated models + added response validation + better error logging
 # -------------------------------
 def ask_groq(prompt):
+    if not GROQ_API_KEY:
+        print("DEBUG Groq: API key not set")
+        return None
     try:
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-        data = {"model": "llama3-8b-8192", "messages": [{"role": "user", "content": prompt}]}
-        response = requests.post(url, headers=headers, json=data, timeout=10)
-        if response.status_code == 200: return response.json()["choices"][0]["message"]["content"]
-        print(f"DEBUG Groq: {response.status_code} - {response.text}")
-    except Exception as e: print(f"DEBUG Groq Ex: {e}")
+        # FIX: Updated to a current, stable model
+        data = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 1024
+        }
+        response = requests.post(url, headers=headers, json=data, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+            if content:
+                return content
+            print("DEBUG Groq: Empty content in response")
+        else:
+            print(f"DEBUG Groq: {response.status_code} - {response.text[:300]}")
+    except Exception as e:
+        print(f"DEBUG Groq Exception: {e}")
     return None
 
 def ask_openrouter(prompt):
+    if not OPENROUTER_API_KEY:
+        print("DEBUG OpenRouter: API key not set")
+        return None
     try:
         url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json"}
-        data = {"model": "meta-llama/llama-3-8b-instruct", "messages": [{"role": "user", "content": prompt}]}
-        response = requests.post(url, headers=headers, json=data, timeout=10)
-        if response.status_code == 200: return response.json()["choices"][0]["message"]["content"]
-        print(f"DEBUG OR: {response.status_code} - {response.text}")
-    except Exception as e: print(f"DEBUG OR Ex: {e}")
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            # FIX: OpenRouter recommends these headers
+            "HTTP-Referer": "http://localhost:5000",
+            "X-Title": "Life Decision Assistant"
+        }
+        # FIX: Use a reliably available free model on OpenRouter
+        data = {
+            "model": "mistralai/mistral-7b-instruct",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 1024
+        }
+        response = requests.post(url, headers=headers, json=data, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+            if content:
+                return content
+            print("DEBUG OpenRouter: Empty content in response")
+        else:
+            print(f"DEBUG OpenRouter: {response.status_code} - {response.text[:300]}")
+    except Exception as e:
+        print(f"DEBUG OpenRouter Exception: {e}")
     return None
 
 def ask_gemini(prompt):
+    if not GEMINI_API_KEY:
+        print("DEBUG Gemini: API key not set")
+        return None
     try:
+        # FIX: Use gemini-1.5-flash (stable endpoint)
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
         data = {"contents": [{"parts": [{"text": prompt}]}]}
-        response = requests.post(url, json=data, timeout=10)
-        if response.status_code == 200: return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-        print(f"DEBUG Gem: {response.status_code} - {response.text}")
-    except Exception as e: print(f"DEBUG Gem Ex: {e}")
+        response = requests.post(url, json=data, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            # FIX: Safer nested access to avoid KeyError on unexpected response shapes
+            candidates = result.get("candidates", [])
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts", [])
+                if parts:
+                    content = parts[0].get("text", "").strip()
+                    if content:
+                        return content
+            print(f"DEBUG Gemini: Unexpected response structure: {result}")
+        else:
+            print(f"DEBUG Gemini: {response.status_code} - {response.text[:300]}")
+    except Exception as e:
+        print(f"DEBUG Gemini Exception: {e}")
     return None
 
 def ask_ai(prompt):
-    for engine in [ask_groq, ask_openrouter, ask_gemini]:
-        reply = engine(prompt)
-        if reply: return reply
-    return "⚠️ Neural Link Offline. All AI engines are currently unresponsive."
+    """Try Groq → OpenRouter → Gemini with fallback chain."""
+    for engine_fn in [ask_groq, ask_openrouter, ask_gemini]:
+        reply = engine_fn(prompt)
+        if reply:
+            return reply
+    return "⚠️ Neural Link Offline. All AI engines are currently unresponsive. Please check your API keys in the .env file."
 
 # -------------------------------
 # AUTHENTICATION ROUTES
@@ -150,13 +205,11 @@ def forgot_password():
             flash("Keyphrases do not match. Try again.", "error")
             return redirect(url_for("forgot_password"))
 
-        # Update password
         users[email]["password"] = new_password
         save_users(users)
         flash("Keyphrase successfully reset! You can now login.", "success")
         return redirect(url_for("login"))
 
-    # GET request
     return render_template("forgot_password.html")
 
 # -------------------------------
