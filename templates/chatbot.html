@@ -39,7 +39,6 @@ body {
     flex-direction: column;
     box-shadow: 0 0 50px rgba(0,0,0,0.5);
     overflow: hidden;
-    position: relative;
 }
 header {
     padding: 20px 30px;
@@ -82,7 +81,11 @@ header {
 .ai-msg { align-self: flex-start; background: var(--ai-bubble); border-radius: 0 20px 20px 20px; border-left: 2px solid var(--gold); }
 .user-msg { align-self: flex-end; background: var(--user-bubble); border-radius: 20px 20px 0 20px; border: 1px solid rgba(255,255,255,0.05); }
 .ai-label { font-family: 'Orbitron', sans-serif; font-size: 8px; color: var(--gold); display: block; margin-bottom: 5px; opacity: 0.6; }
-
+.typing-dots { display: inline-flex; gap: 4px; padding: 4px 0; }
+.typing-dots span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: bounce 1.2s infinite; opacity: 0.6; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 .input-area {
     padding: 20px;
     background: rgba(0,0,0,0.4);
@@ -99,43 +102,29 @@ header {
     display: flex;
     align-items: center;
 }
-#message { width: 100%; padding: 12px 0; background: transparent; border: none; color: #fff; outline: none; }
-.send-btn {
-    width: 45px; height: 45px;
-    border-radius: 12px;
-    border: none;
-    background: var(--gold);
-    color: #000;
-    cursor: pointer;
-}
-
-/* Mobile responsiveness */
-@media(max-width: 480px) {
-    .container { border-radius: 20px; }
-    .status-pill { display: none; }
-}
+#message { width: 100%; padding: 12px 0; background: transparent; border: none; color: #fff; outline: none; font-family: 'Poppins', sans-serif; }
+.send-btn { width: 45px; height: 45px; border-radius: 12px; border: none; background: var(--gold); color: #000; cursor: pointer; }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+@media(max-width: 480px) { .container { border-radius: 20px; } .status-pill { display: none; } }
 </style>
 </head>
 <body>
-
 <div class="container">
     <header>
         <div class="oracle-brand"><h2>AI Oracle</h2></div>
         <div class="status-pill">SOVEREIGN_LINK_STABLE</div>
     </header>
-
     <div id="chat-box">
         <div class="msg ai-msg">
             <span class="ai-label">SYSTEM_INITIALIZED</span>
             Greetings, architect. I am the <b>Aether Oracle</b>. How shall we navigate your path today?
         </div>
     </div>
-
     <div class="input-area">
         <div class="input-wrapper">
             <input type="text" id="message" placeholder="Input directive..." autocomplete="off">
         </div>
-        <button class="send-btn" onclick="sendMessage()">
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
             <i class="fas fa-bolt"></i>
         </button>
     </div>
@@ -144,31 +133,80 @@ header {
 <script>
 const inputField = document.getElementById("message");
 const chat = document.getElementById("chat-box");
+const sendBtn = document.getElementById("sendBtn");
 
-function sendMessage(){
+inputField.addEventListener("keydown", (e) => { if(e.key === "Enter") sendMessage(); });
+
+async function sendMessage() {
     const message = inputField.value.trim();
-    if(!message) return;
+    if (!message) return;
 
-    const userDiv = document.createElement("div");
-    userDiv.className = "msg user-msg";
-    userDiv.textContent = message;
-    chat.appendChild(userDiv);
+    // Show user message
+    appendMsg("user-msg", message);
     inputField.value = "";
+    sendBtn.disabled = true;
+
+    // Show typing indicator
+    const typingDiv = document.createElement("div");
+    typingDiv.className = "msg ai-msg";
+    typingDiv.id = "typing";
+    typingDiv.innerHTML = `<span class="ai-label">ORACLE_PROCESSING</span><div class="typing-dots"><span></span><span></span><span></span></div>`;
+    chat.appendChild(typingDiv);
     scrollToBottom();
 
-    // Mock response logic
-    setTimeout(() => {
+    try {
+        const response = await fetch("/chatbot_api", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+
+        document.getElementById("typing")?.remove();
+
         const aiDiv = document.createElement("div");
         aiDiv.className = "msg ai-msg";
-        aiDiv.innerHTML = `<span class="ai-label">ORACLE_RESPONSE</span>Synthesizing data for: ${message}...`;
+        aiDiv.innerHTML = `<span class="ai-label">ORACLE_RESPONSE</span><span id="typeTarget"></span>`;
         chat.appendChild(aiDiv);
         scrollToBottom();
-    }, 1000);
+        typeText(data.reply, aiDiv.querySelector("#typeTarget"));
+    } catch (err) {
+        document.getElementById("typing")?.remove();
+        appendMsg("ai-msg", "⚠️ Neural link error. Please try again.");
+    } finally {
+        sendBtn.disabled = false;
+    }
 }
 
-function scrollToBottom() {
-    chat.scrollTop = chat.scrollHeight;
+function appendMsg(cls, text) {
+    const div = document.createElement("div");
+    div.className = `msg ${cls}`;
+    div.textContent = text;
+    chat.appendChild(div);
+    scrollToBottom();
 }
+
+function typeText(text, el) {
+    let processed = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    let i = 0;
+    el.innerHTML = "";
+    function tick() {
+        if (i < processed.length) {
+            if (processed[i] === "<") {
+                let end = processed.indexOf(">", i);
+                el.innerHTML += processed.substring(i, end + 1);
+                i = end + 1;
+            } else {
+                el.innerHTML += processed[i++];
+            }
+            setTimeout(tick, 12);
+            scrollToBottom();
+        }
+    }
+    tick();
+}
+
+function scrollToBottom() { chat.scrollTop = chat.scrollHeight; }
 </script>
 </body>
 </html>
