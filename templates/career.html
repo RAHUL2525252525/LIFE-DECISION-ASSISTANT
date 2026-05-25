@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Career Architect | Aether Sovereign</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&family=Poppins:wght@400;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             --gold: #d4af37;
@@ -16,9 +14,7 @@
             --glass: rgba(10, 10, 10, 0.9);
             --border: rgba(212, 175, 55, 0.2);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background: var(--bg-dark);
             color: #fff;
@@ -32,7 +28,6 @@
                               linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px);
             background-size: 40px 40px;
         }
-
         .container {
             max-width: 900px;
             width: 100%;
@@ -42,9 +37,7 @@
             padding: clamp(20px, 5vw, 60px);
             border: 1px solid var(--border);
             box-shadow: 0 0 100px rgba(0,0,0,1);
-            position: relative;
         }
-
         h2 {
             font-family: 'Cinzel', serif;
             font-size: clamp(1.5rem, 5vw, 2.8rem);
@@ -56,46 +49,12 @@
             margin-bottom: 8px;
             text-transform: uppercase;
         }
-
-        .subtitle {
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--gold);
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-weight: 600;
-        }
-
-        .form-deck {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
+        .subtitle { text-align: center; font-size: 0.75rem; color: var(--gold); margin-bottom: 40px; text-transform: uppercase; letter-spacing: 4px; font-weight: 600; }
+        .form-deck { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .input-group { position: relative; }
-        
-        label {
-            display: block;
-            font-size: 0.7rem;
-            color: var(--gold);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        select, input[type="text"] {
-            width: 100%;
-            padding: 18px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.5);
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-        }
-
+        label { display: block; font-size: 0.7rem; color: var(--gold); margin-bottom: 10px; font-weight: 600; }
+        select, input[type="text"] { width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border); background: rgba(0,0,0,0.5); color: #fff; font-size: 14px; outline: none; }
         .custom-input { display: none; margin-top: 10px; border-style: dashed; }
-
         .btn-architect {
             grid-column: span 2;
             padding: 20px;
@@ -107,21 +66,16 @@
             background: linear-gradient(135deg, var(--gold-bright), var(--gold));
             text-transform: uppercase;
             transition: 0.3s;
+            letter-spacing: 2px;
         }
-
+        .btn-architect:disabled { opacity: 0.5; cursor: not-allowed; }
         #careerResults { display: none; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 40px; }
-
-        .matrix-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 30px;
-        }
-
+        .matrix-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
         .stat-card { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
         .stat-bar { margin-bottom: 20px; }
+        .stat-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
         .bar-bg { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
         .bar-fill { height: 100%; background: var(--gold); width: 0%; border-radius: 2px; transition: width 1s; }
-
         .roadmap-terminal {
             background: #000;
             border: 1px solid var(--border);
@@ -129,19 +83,17 @@
             padding: 25px;
             font-family: 'Fira Code', monospace;
             font-size: 12px;
-            line-height: 1.6;
+            line-height: 1.8;
             color: #ccc;
+            min-height: 150px;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
-
-        /* Responsive Breakpoints */
-        @media(max-width: 768px) {
-            .form-deck, .matrix-grid { grid-template-columns: 1fr; }
-            .btn-architect { grid-column: span 1; }
-        }
+        #loader { display:none; text-align:center; margin-top:20px; color: var(--gold); }
+        @media(max-width: 768px) { .form-deck, .matrix-grid { grid-template-columns: 1fr; } .btn-architect { grid-column: span 1; } }
     </style>
 </head>
 <body>
-
 <div class="container">
     <h2>Career Architect</h2>
     <p class="subtitle">Future-State Alignment Engine</p>
@@ -154,6 +106,9 @@
                     <option value="">-- Select --</option>
                     <option value="Artificial Intelligence">Artificial Intelligence</option>
                     <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
                     <option value="Other">CUSTOM_ENTRY</option>
                 </select>
                 <input type="text" id="interestInput" class="custom-input" placeholder="Specify Domain...">
@@ -162,56 +117,119 @@
                 <label>PRIMARY_LEVERAGE_SKILL</label>
                 <select id="skillsSelect">
                     <option value="">-- Select --</option>
+                    <option value="Python Programming">Python Programming</option>
                     <option value="Software Architecture">Software Architecture</option>
                     <option value="Strategic Leadership">Strategic Leadership</option>
+                    <option value="Data Analysis">Data Analysis</option>
+                    <option value="UI/UX Design">UI/UX Design</option>
                     <option value="Other">CUSTOM_ENTRY</option>
                 </select>
                 <input type="text" id="skillsInput" class="custom-input" placeholder="Specify Expertise...">
             </div>
-            <button type="submit" class="btn-architect">Synthesize Career Path</button>
+            <button type="submit" class="btn-architect" id="careerBtn">Synthesize Career Path</button>
         </div>
     </form>
+
+    <div id="loader"><i class="fas fa-circle-notch fa-spin" style="font-size:28px;"></i><p style="margin-top:10px;font-size:11px;letter-spacing:2px;">SYNTHESIZING PATH...</p></div>
 
     <div id="careerResults">
         <div class="matrix-grid">
             <div class="stat-card">
-                <div class="stat-bar"><div class="stat-meta"><span>MARKET_DEMAND</span><span id="p1">0%</span></div><div class="bar-bg"><div id="b1" class="bar-fill"></div></div></div>
-                <div class="stat-bar"><div class="stat-meta"><span>SCALABILITY</span><span id="p2">0%</span></div><div class="bar-bg"><div id="b2" class="bar-fill"></div></div></div>
+                <div class="stat-bar">
+                    <div class="stat-meta"><span>MARKET_DEMAND</span><span id="p1">0%</span></div>
+                    <div class="bar-bg"><div id="b1" class="bar-fill"></div></div>
+                </div>
+                <div class="stat-bar">
+                    <div class="stat-meta"><span>SCALABILITY</span><span id="p2">0%</span></div>
+                    <div class="bar-bg"><div id="b2" class="bar-fill"></div></div>
+                </div>
+                <div class="stat-bar">
+                    <div class="stat-meta"><span>GROWTH_POTENTIAL</span><span id="p3">0%</span></div>
+                    <div class="bar-bg"><div id="b3" class="bar-fill"></div></div>
+                </div>
             </div>
-            <div id="roadmapBox" class="roadmap-terminal"></div>
+            <div id="roadmapBox" class="roadmap-terminal">◈ Awaiting synthesis...</div>
         </div>
     </div>
 </div>
 
 <script>
-    // Logic to handle custom inputs
-    document.getElementById("interestSelect").addEventListener("change", (e) => {
-        document.getElementById("interestInput").style.display = e.target.value === "Other" ? "block" : "none";
-    });
-    document.getElementById("skillsSelect").addEventListener("change", (e) => {
-        document.getElementById("skillsInput").style.display = e.target.value === "Other" ? "block" : "none";
-    });
+document.getElementById("interestSelect").addEventListener("change", (e) => {
+    document.getElementById("interestInput").style.display = e.target.value === "Other" ? "block" : "none";
+});
+document.getElementById("skillsSelect").addEventListener("change", (e) => {
+    document.getElementById("skillsInput").style.display = e.target.value === "Other" ? "block" : "none";
+});
 
-    document.getElementById("careerForm").addEventListener("submit", (e) => {
-        e.preventDefault();
+document.getElementById("careerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const interest = document.getElementById("interestSelect").value === "Other"
+        ? document.getElementById("interestInput").value.trim()
+        : document.getElementById("interestSelect").value;
+    const skills = document.getElementById("skillsSelect").value === "Other"
+        ? document.getElementById("skillsInput").value.trim()
+        : document.getElementById("skillsSelect").value;
+
+    if (!interest || !skills) return alert("Please select both domain and skill.");
+
+    const btn = document.getElementById("careerBtn");
+    btn.disabled = true;
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("careerResults").style.display = "none";
+
+    try {
+        const response = await fetch("/career_api", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ interest, skills })
+        });
+        const data = await response.json();
+
+        document.getElementById("loader").style.display = "none";
         document.getElementById("careerResults").style.display = "block";
-        animateStat('b1', 'p1', 95);
-        animateStat('b2', 'p2', 88);
-        document.getElementById("roadmapBox").innerHTML = "◈ Initializing neural pathways...<br>◈ Identifying market gaps...<br>◈ Synthesis complete.";
-    });
 
-    function animateStat(barId, textId, target) {
-        let bar = document.getElementById(barId);
-        let text = document.getElementById(textId);
-        bar.style.width = target + "%";
-        let count = 0;
-        let interval = setInterval(() => {
-            if (count >= target) clearInterval(interval);
-            text.innerText = count + "%";
-            count++;
-        }, 15);
+        animateStat('b1', 'p1', 90 + Math.floor(Math.random() * 9));
+        animateStat('b2', 'p2', 80 + Math.floor(Math.random() * 15));
+        animateStat('b3', 'p3', 75 + Math.floor(Math.random() * 20));
+
+        typeAI(data.reply, document.getElementById("roadmapBox"));
+    } catch (err) {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("roadmapBox").textContent = "⚠️ Neural link failed. Please try again.";
+        document.getElementById("careerResults").style.display = "block";
+    } finally {
+        btn.disabled = false;
     }
-</script>
+});
 
+function animateStat(barId, textId, target) {
+    document.getElementById(barId).style.width = target + "%";
+    let count = 0;
+    const interval = setInterval(() => {
+        if (count >= target) { clearInterval(interval); return; }
+        document.getElementById(textId).innerText = count++ + "%";
+    }, 15);
+}
+
+function typeAI(text, el) {
+    let processed = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    let i = 0;
+    el.innerHTML = "";
+    function tick() {
+        if (i < processed.length) {
+            if (processed[i] === "<") {
+                let end = processed.indexOf(">", i);
+                el.innerHTML += processed.substring(i, end + 1);
+                i = end + 1;
+            } else {
+                el.innerHTML += processed[i++];
+            }
+            setTimeout(tick, 10);
+        }
+    }
+    tick();
+}
+</script>
 </body>
 </html>
