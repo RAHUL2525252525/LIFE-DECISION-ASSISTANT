@@ -32,29 +32,6 @@ body {
 
 canvas { position: fixed; inset: 0; z-index: -1; }
 
-/* BOOT */
-#boot {
-    position: fixed; inset: 0; background: #000; z-index: 10000;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    transition: transform 1.2s cubic-bezier(.8,0,.2,1);
-}
-
-.boot-ring {
-    width: 100px; height: 100px; border: 2px solid transparent;
-    border-top: 2px solid var(--gold); border-radius: 50%;
-    animation: spin 1s linear infinite;
-    box-shadow: 0 0 30px var(--gold-glow), inset 0 0 15px var(--gold-glow);
-}
-
-.boot-title {
-    margin-top: 40px; font-family: 'Cinzel'; font-size: 24px; font-weight: 900;
-    letter-spacing: 12px; text-transform: uppercase;
-    background: linear-gradient(to right,#8a6628,var(--gold-bright),#8a6628);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
 /* HEADER */
 .header { padding: 30px 10px 10px; text-align: center; z-index: 100; }
 .project-title { 
@@ -120,18 +97,13 @@ iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; le
 .exit { border-left: 1px solid rgba(255,255,255,.1); margin-left: 5px; padding-left: 5px; }
 
 @media (max-width: 480px) {
-    .dock-btn span { display: none; } /* Hide text on very small screens to save space */
+    .dock-btn span { display: none; }
     .dock-btn { height: 50px; }
 }
 </style>
 </head>
 
 <body>
-
-<div id="boot">
-    <div class="boot-ring"></div>
-    <h1 class="boot-title">Life Decision Assistant</h1>
-</div>
 
 <canvas id="neuralCanvas"></canvas>
 
@@ -170,11 +142,8 @@ iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; le
 </div>
 
 <script>
-window.addEventListener("load",()=>{
-    setTimeout(()=>{
-        document.getElementById("boot").style.transform="translateY(-100%)";
-        initParticles();
-    }, 3000);
+window.addEventListener("load", () => {
+    initParticles();
 });
 
 let activeFrame = null;
